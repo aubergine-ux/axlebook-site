@@ -1,0 +1,222 @@
+---
+import '../styles/global.css';
+import { NAV, REPO, SITE } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const path = Astro.url.pathname;
+const canonical = new URL(path, SITE).href;
+const fullTitle = path === '/' ? `Axlebook: ${title}` : `${title} · Axlebook`;
+const og = new URL('/og-image.png', SITE).href;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#f4f5f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121416" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/Archivo-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Axlebook" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Axlebook: every mile, on the record." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og} />
+    <script is:inline>
+      // Apply the saved theme before the page paints. Stored in this browser only.
+      (() => {
+        let t = null;
+        try {
+          t = localStorage.getItem('theme');
+        } catch {}
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a href="/" class="brand" aria-label="Axlebook home">
+          <img class="on-light" src="/brand/axlebook-lockup-horizontal-on-light.svg" alt="" width="160" height="35" />
+          <img class="on-dark" src="/brand/axlebook-lockup-horizontal-on-dark.svg" alt="" width="160" height="35" />
+        </a>
+        <nav aria-label="Main">
+          <ul>
+            {
+              NAV.map((n) => (
+                <li>
+                  <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>
+                    {n.label}
+                  </a>
+                </li>
+              ))
+            }
+            <li class="gh"><a href={REPO}>GitHub</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="theme" id="theme" aria-live="polite">Theme: system</button>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap foot">
+        <p>
+          <strong>Axlebook</strong>, a self-hosted logbook for your vehicles. Free software under the
+          <a href={`${REPO}/blob/main/LICENSE`}>AGPL-3.0</a>.
+        </p>
+        <ul>
+          {NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          <li><a href={REPO}>Source code</a></li>
+          <li><a href={`${REPO}/issues`}>Report a problem</a></li>
+        </ul>
+        <p class="muted small">This site has no analytics, no cookies and no third-party requests.</p>
+      </div>
+    </footer>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const btn = document.getElementById('theme');
+        const order = ['system', 'light', 'dark'];
+        const sources = () => document.querySelectorAll('source[data-theme-source]');
+        const apply = (t) => {
+          if (t === 'system') delete root.dataset.theme;
+          else root.dataset.theme = t;
+          // Screenshots: follow the chosen theme rather than the system one.
+          for (const s of sources())
+            s.media = t === 'dark' ? 'all' : t === 'light' ? 'not all' : '(prefers-color-scheme: dark)';
+          btn.textContent = `Theme: ${t}`;
+        };
+        let current = 'system';
+        try {
+          current = localStorage.getItem('theme') || 'system';
+        } catch {}
+        apply(current);
+        btn.addEventListener('click', () => {
+          current = order[(order.indexOf(current) + 1) % order.length];
+          try {
+            if (current === 'system') localStorage.removeItem('theme');
+            else localStorage.setItem('theme', current);
+          } catch {}
+          apply(current);
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    min-height: 64px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .brand img {
+    height: 30px;
+    width: auto;
+  }
+  nav {
+    order: 3;
+    width: 100%;
+  }
+  nav ul {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+  }
+  nav a {
+    display: block;
+    padding: 10px 7px;
+    border-radius: var(--radius-md);
+    color: var(--ink-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  nav a:hover {
+    color: var(--ink);
+    background: var(--surface-sunken);
+  }
+  nav a[aria-current='page'] {
+    color: var(--orange-text);
+    background: var(--orange-soft);
+  }
+  .theme {
+    margin-left: auto;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    color: var(--ink);
+    font: 600 14px var(--sans);
+    cursor: pointer;
+  }
+  @media (min-width: 420px) {
+    nav a {
+      padding: 10px 12px;
+    }
+  }
+  @media (min-width: 900px) {
+    nav {
+      order: 0;
+      width: auto;
+    }
+    .theme {
+      margin-left: auto;
+    }
+  }
+  .site-footer {
+    margin-top: 64px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-raised);
+    padding: 32px 0;
+    font-size: 15px;
+  }
+  .foot ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+  }
+  .small {
+    font-size: 14px;
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+// A screenshot in the visitor's theme: light and dark variants, resized and converted to WebP.
+import { getImage } from 'astro:assets';
+interface Props {
+  name: string;
+  alt: string;
+  width?: number;
+  eager?: boolean;
+}
+const { name, alt, width = 1200, eager = false } = Astro.props;
+const all = import.meta.glob<{ default: ImageMetadata }>('../assets/screenshots/*.png', { eager: true });
+const src = (n: string) => all[`../assets/screenshots/${n}.png`]?.default;
+const light = src(`${name}-light`) ?? src(name);
+const dark = src(`${name}-dark`);
+if (!light) throw new Error(`missing screenshot ${name}`);
+const widths = [width / 2, width].map(Math.round);
+const opts = { widths, sizes: `(min-width: 1120px) ${width}px, 100vw`, format: 'webp' as const };
+const l = await getImage({ src: light, ...opts });
+const d = dark ? await getImage({ src: dark, ...opts }) : null;
+const h = Math.round((light.height / light.width) * width);
+---
+<picture>
+  {d && <source media="(prefers-color-scheme: dark)" srcset={d.srcSet.attribute} sizes={opts.sizes} data-theme-source />}
+  <img
+    src={l.src}
+    srcset={l.srcSet.attribute}
+    sizes={opts.sizes}
+    alt={alt}
+    width={width}
+    height={h}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={eager ? 'high' : undefined}
+    class="shot"
+    data-light={l.srcSet.attribute}
+    data-dark={d?.srcSet.attribute}
+  />
+</picture>
+<style>
+  .shot {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    width: 100%;
+  }
+</style>
