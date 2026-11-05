@@ -1,0 +1,195 @@
+---
+import Base from '../../layouts/Base.astro';
+import { REPO } from '../../data/site';
+import envExample from '../../data/env.example?raw';
+
+const toc = [
+  ['install', 'Install with Docker Compose'],
+  ['configuration', 'Configuration'],
+  ['backups', 'Backups and restore'],
+  ['upgrading', 'Upgrading'],
+  ['reverse-proxy', 'Reverse proxy'],
+  ['importing', 'Importing data'],
+];
+---
+<Base
+  title="Docs"
+  description="Install Axlebook with Docker Compose, configure it, back it up, upgrade it, run it behind Caddy, nginx or Traefik, and import your existing records."
+>
+  <div class="wrap layout">
+    <aside aria-label="On this page">
+      <h2 class="toc-title">On this page</h2>
+      <ul>{toc.map(([id, label]) => <li><a href={`#${id}`}>{label}</a></li>)}</ul>
+    </aside>
+    <article class="prose">
+      <h1 class="ax-display">Docs</h1>
+
+      <h2 id="install">Install with Docker Compose</h2>
+      <p>You need Docker with Compose v2. On Windows and macOS, Docker Desktop works.</p>
+      <pre tabindex="0"><code>git clone https://github.com/aubergine-ux/axlebook.git
+cd axlebook
+docker compose up -d</code></pre>
+      <p>
+        Open <code>http://localhost:8080</code> and create your account. Everything you enter is kept in the
+        <code>axlebook-data</code> volume. To look around first, put <code>SEED_DEMO_DATA=true</code> in a
+        <code>.env</code> file next to <code>docker-compose.yml</code> before the first start: you get a 2015
+        Tacoma and a 2018 Civic with a couple of years of history.
+      </p>
+      <h3>Using the published image</h3>
+      <p>Images for <code>linux/amd64</code> and <code>linux/arm64</code> are published to GitHub Container Registry with each release.</p>
+      <pre tabindex="0"><code>{`services:
+  axlebook:
+    image: ghcr.io/aubergine-ux/axlebook:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      BASE_URL: https://cars.example.com
+      TZ: America/Chicago
+    volumes:
+      - axlebook-data:/data
+volumes:
+  axlebook-data:`}</code></pre>
+      <h3>Postgres instead of SQLite</h3>
+      <p>SQLite is plenty for a household. For Postgres, use the bundled overlay or point <code>DATABASE_URL</code> at a server you already run:</p>
+      <pre tabindex="0"><code>POSTGRES_PASSWORD=pick-something docker compose -f docker-compose.yml -f docker-compose.postgres.yml up -d</code></pre>
+      <h3>Optional local AI</h3>
+      <p>The Ollama overlay adds a private model server; the model downloads once (about 2 GB) on first start:</p>
+      <pre tabindex="0"><code>docker compose -f docker-compose.yml -f docker-compose.ai.yml up -d</code></pre>
+
+      <h2 id="configuration">Configuration</h2>
+      <p>
+        Everything is an environment variable and everything is optional. Put them in a <code>.env</code> file
+        next to <code>docker-compose.yml</code>. This is the app’s
+        <a href={`${REPO}/blob/main/.env.example`}><code>.env.example</code></a>, exactly as it ships:
+      </p>
+      <pre class="env" tabindex="0" aria-label=".env.example"><code>{envExample}</code></pre>
+
+      <h2 id="backups">Backups and restore</h2>
+      <p>
+        <strong>From the app:</strong> Settings, Your data, Download backup. You get a zip with every record,
+        reminder, part, inspection, photo and receipt. Admins get the whole instance; everyone else gets the
+        vehicles they own.
+      </p>
+      <p>
+        <strong>Restoring:</strong> on a fresh install with no vehicles yet, an admin uses Settings, Your data,
+        Restore a backup. Accounts are matched by username. A backup restores into SQLite or Postgres, so this is
+        also how you move between them.
+      </p>
+      <p><strong>From the command line</strong>, for scheduled backups of the data directory:</p>
+      <pre tabindex="0"><code>{`docker compose stop axlebook
+docker compose cp axlebook:/data ./axlebook-backup-$(date +%F)
+docker compose start axlebook`}</code></pre>
+      <p>With Postgres, also run <code>pg_dump</code> against the database.</p>
+
+      <h2 id="upgrading">Upgrading</h2>
+      <p>Take a backup first. Then, if you built from source:</p>
+      <pre tabindex="0"><code>{`git pull
+docker compose up -d --build`}</code></pre>
+      <p>Or, with the published image:</p>
+      <pre tabindex="0"><code>{`docker compose pull
+docker compose up -d`}</code></pre>
+      <p>The database is upgraded automatically when Axlebook starts. Your data stays in the volume.</p>
+
+      <h2 id="reverse-proxy">Reverse proxy</h2>
+      <p>
+        Set <code>BASE_URL</code> to the address people type (scheme, host and port all count) and
+        <code>TRUST_PROXY=true</code>. Axlebook refuses changes that come from any other origin. Allow uploads at
+        least as large as <code>MAX_UPLOAD_MB</code> (25 MB by default).
+      </p>
+      <h3>Caddy</h3>
+      <pre tabindex="0"><code>{`cars.example.com {
+	reverse_proxy localhost:8080
+}`}</code></pre>
+      <h3>nginx</h3>
+      <pre tabindex="0"><code>{`server {
+    listen 443 ssl;
+    server_name cars.example.com;
+    # ssl_certificate and ssl_certificate_key go here
+    client_max_body_size 25m;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}`}</code></pre>
+      <h3>Traefik</h3>
+      <p>Labels on the <code>axlebook</code> service, with Traefik’s Docker provider and an entrypoint named <code>websecure</code>:</p>
+      <pre tabindex="0"><code>{`services:
+  axlebook:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.axlebook.rule=Host(\`cars.example.com\`)
+      - traefik.http.routers.axlebook.entrypoints=websecure
+      - traefik.http.routers.axlebook.tls=true
+      - traefik.http.services.axlebook.loadbalancer.server.port=8080
+    environment:
+      BASE_URL: https://cars.example.com
+      TRUST_PROXY: "true"`}</code></pre>
+
+      <h2 id="importing">Importing data</h2>
+      <ul>
+        <li>
+          <strong>A spreadsheet you already keep:</strong> Garage, Import a spreadsheet. Upload an .xlsx or .csv
+          with one sheet per vehicle or several vehicles in one sheet. Check the columns, units and vehicles it
+          found, fill in anything missing, preview, then import. Rows already in Axlebook are skipped.
+        </li>
+        <li>
+          <strong>CSV for one vehicle:</strong> on a vehicle’s Records tab, Import CSV. Choose the record type and date order, preview,
+          then import. Axlebook’s own CSV export imports back the same way.
+        </li>
+        <li>
+          <strong>From LubeLogger (experimental):</strong> export a CSV from LubeLogger and import it the same way;
+          its column names are recognised.
+        </li>
+        <li><strong>Another Axlebook:</strong> restore a backup, as above.</li>
+      </ul>
+      <p>
+        Something didn’t import the way you expected? <a href={`${REPO}/issues`}>Open an issue</a> with a sample of
+        the file (with personal details removed).
+      </p>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-top: 48px;
+  }
+  @media (min-width: 960px) {
+    .layout {
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 48px;
+    }
+    aside ul {
+      position: sticky;
+      top: 96px;
+    }
+  }
+  .toc-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  aside ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  aside li {
+    margin: 6px 0;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+  .env {
+    max-height: 640px;
+  }
+</style>

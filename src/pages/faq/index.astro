@@ -1,0 +1,79 @@
+---
+import Base from '../../layouts/Base.astro';
+import { REPO } from '../../data/site';
+---
+<Base
+  title="FAQ"
+  description="Common questions about Axlebook: what it costs, where your data lives, how to back it up, whether it phones home, and how it compares with other trackers."
+>
+  <div class="wrap prose faq">
+    <h1 class="ax-display">Questions</h1>
+
+    <h2>Is it free?</h2>
+    <p>
+      Yes. Axlebook is free software under the <a href={`${REPO}/blob/main/LICENSE`}>AGPL-3.0</a>. There’s no paid
+      tier, no account to create with anyone, and nothing locked behind a subscription. You can use it, change it and
+      host it for yourself or your family. If you run a modified version as a service for other people, the license
+      asks you to share your changes under the same terms.
+    </p>
+
+    <h2>Where is my data?</h2>
+    <p>
+      On the machine you run it on. With the default setup that’s a SQLite database plus your photos and receipts in
+      one Docker volume (<code>/data</code> inside the container). With Postgres, the records live in your database and
+      the files stay in <code>/data</code>.
+    </p>
+
+    <h2>How do I back it up?</h2>
+    <p>
+      Settings, Your data, Download backup gives you a zip of everything, including photos and receipts. For scheduled
+      backups, copy the <code>/data</code> directory (and run <code>pg_dump</code> if you use Postgres). The
+      <a href="/docs/#backups">backup docs</a> have the commands.
+    </p>
+
+    <h2>Does it phone home?</h2>
+    <p>
+      No. There’s no telemetry, no update check and no analytics. Axlebook only contacts other servers you’ve set up
+      yourself: an email server or notification service for reminders, an identity provider for single sign-on, or a
+      local Ollama server for the optional AI features. It runs fine on a network with no internet access.
+    </p>
+
+    <h2>Does it work on my phone?</h2>
+    <p>
+      Yes. It’s designed for phones first and can be installed to your home screen. Logging a fill-up works without
+      signal; it’s sent when you’re back online.
+    </p>
+
+    <h2>Can my household share it?</h2>
+    <p>
+      Yes. Create accounts with admin, editor or viewer roles, and share a vehicle with someone for viewing or editing.
+    </p>
+
+    <h2>How is it different from other trackers?</h2>
+    <p>
+      Many vehicle trackers are hosted services, where your records live on someone else’s servers. Axlebook is
+      self-hosted, like a few other open-source projects such as LubeLogger. Within that group, Axlebook’s focus is on:
+    </p>
+    <ul>
+      <li>full-tank-to-full-tank fuel economy that handles partial and missed fill-ups;</li>
+      <li>reminders by date, distance or both, that reschedule from the record that completes them;</li>
+      <li>motorcycles, dirt bikes, ATVs, snowmobiles, semis and trailers alongside cars, with engine hours and kWh;</li>
+      <li>importing the spreadsheet you already keep, including several vehicles in one file;</li>
+      <li>a documented REST API for everything, and SQLite or Postgres.</li>
+    </ul>
+    <p>The best choice is the one that fits how you work; most of these projects, Axlebook included, are free to try.</p>
+
+    <h2>I found a bug or want a feature</h2>
+    <p><a href={`${REPO}/issues`}>Open an issue on GitHub</a>. Translations and code are welcome too.</p>
+  </div>
+</Base>
+
+<style>
+  .faq {
+    padding-top: 48px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+</style>

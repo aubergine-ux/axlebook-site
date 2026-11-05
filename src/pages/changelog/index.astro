@@ -1,0 +1,82 @@
+---
+import { marked } from 'marked';
+import Base from '../../layouts/Base.astro';
+import { REPO } from '../../data/site';
+
+// Release notes come from the app repository's GitHub releases, read when the site is built.
+interface Release {
+  tag_name: string;
+  name: string | null;
+  body: string | null;
+  published_at: string;
+  html_url: string;
+  draft: boolean;
+  prerelease: boolean;
+}
+let releases: Release[] = [];
+try {
+  const res = await fetch('https://api.github.com/repos/aubergine-ux/axlebook/releases?per_page=50', {
+    headers: { accept: 'application/vnd.github+json', 'user-agent': 'axlebook-site-build' },
+  });
+  if (res.ok) releases = ((await res.json()) as Release[]).filter((r) => !r.draft);
+} catch {
+  // Offline build: fall back to the first-release summary below.
+}
+const rendered = await Promise.all(
+  releases.map(async (r) => ({ ...r, html: await marked.parse(r.body ?? '') })),
+);
+const date = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<Base title="Changelog" description="What changed in each Axlebook release.">
+  <div class="wrap prose log">
+    <h1 class="ax-display">Changelog</h1>
+    {
+      rendered.length > 0 ? (
+        rendered.map((r) => (
+          <section class="release">
+            <h2>
+              <a href={r.html_url}>{r.name || r.tag_name}</a>
+            </h2>
+            <p class="mono muted">{date(r.published_at)}</p>
+            <div set:html={r.html} />
+          </section>
+        ))
+      ) : (
+        <section class="release">
+          <h2>v1.0</h2>
+          <p class="muted">The first release. Highlights:</p>
+          <ul>
+            <li>Garage of vehicles with photos, nicknames, archive, and sections for cars, powersports and semis.</li>
+            <li>Service, repair, upgrade, fuel and expense records with tags and receipts.</li>
+            <li>Full-to-full fuel economy in MPG, L/100 km or km/L; engine hours and kWh.</li>
+            <li>Reminders by date, distance or both, with notifications by email, webhook, ntfy, Gotify and Discord, and a calendar feed.</li>
+            <li>Built-in maintenance schedules, tips for each vehicle, parts inventory and a planner.</li>
+            <li>Reports with printing and CSV, search across the garage.</li>
+            <li>Spreadsheet and CSV import (LubeLogger experimental), CSV export, full backup and restore.</li>
+            <li>Inspections (DVIR) and an IFTA worksheet for semi trucks.</li>
+            <li>Accounts with roles, vehicle sharing, API tokens, optional single sign-on.</li>
+            <li>Installable on phones, with offline fuel logging; SQLite or Postgres; optional local AI through Ollama.</li>
+          </ul>
+          <p>
+            Full history in the <a href={`${REPO}/commits/main`}>commit log</a>.
+          </p>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .log {
+    padding-top: 48px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+  .release + .release {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+</style>
