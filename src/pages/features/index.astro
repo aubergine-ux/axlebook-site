@@ -80,20 +80,34 @@ const groups: { title: string; items: [string, string, string][] }[] = [
     }
 
     <section class="group" aria-labelledby="local-model">
-      <h2 id="local-model">Optional local AI</h2>
+      <h2 id="local-model">Local assistant (Ollama)</h2>
       <div class="grid grid-2">
         <div class="prose">
           <p>
-            If you run <a href="https://ollama.com">Ollama</a> next to Axlebook, it can help in a few places:
-            reading a messy spreadsheet, tailoring the maintenance schedule to your exact make and model,
-            estimating what economy your vehicle should get, and giving tips specific to it.
+            Optional, and off unless you turn it on. With <a href="https://ollama.com">Ollama</a> running on your
+            own machine, a model there can:
           </p>
+          <ul>
+            <li>
+              <strong>Scan a receipt.</strong> Photograph it at the pump or the shop; the date, station, amounts
+              and fuel go into the form, and the photo is kept with the record.
+            </li>
+            <li>
+              <strong>Fill in a record from a sentence</strong>, like “filled up 10.8 gal at 3.49, 61402 mi,
+              civic”.
+            </li>
+            <li>
+              <strong>Answer questions from your logbook</strong>, like “when did I last change the oil on the
+              Tacoma?”, with links to the records it used, or a plain “that isn’t in your records”.
+            </li>
+            <li>Help read a messy spreadsheet, tailor the maintenance schedule, and give tips for each vehicle.</li>
+          </ul>
           <p>
-            The model runs on your own server and nothing about your vehicles is sent anywhere. It’s off unless
-            you set it up, and everything else works the same without it.
+            Whatever it reads is a suggestion: nothing is saved until you check the form and press Save. Requests go
+            only to your Ollama server, never to a cloud service, and everything else works the same without it.
           </p>
         </div>
-        <Shot name="schedule" alt="A semi truck’s maintenance schedule showing when each job was last done and when it’s next due" width={700} />
+        <Shot name="assistant-review" alt="A fuel record filled in from a scanned receipt: date, gallons, price per gallon, total and station, waiting to be checked and saved" width={620} />
       </div>
     </section>
   </div>

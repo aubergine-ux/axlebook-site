@@ -53,9 +53,21 @@ volumes:
       <h3>Postgres instead of SQLite</h3>
       <p>SQLite is plenty for a household. For Postgres, use the bundled overlay or point <code>DATABASE_URL</code> at a server you already run:</p>
       <pre tabindex="0"><code>POSTGRES_PASSWORD=pick-something docker compose -f docker-compose.yml -f docker-compose.postgres.yml up -d</code></pre>
-      <h3>Optional local AI</h3>
-      <p>The Ollama overlay adds a private model server; the model downloads once (about 2 GB) on first start:</p>
-      <pre tabindex="0"><code>docker compose -f docker-compose.yml -f docker-compose.ai.yml up -d</code></pre>
+      <h3>Optional local assistant (Ollama)</h3>
+      <p>
+        Receipt scan, quick entry and questions about your logbook, from a model on your own machine. It starts
+        with a Compose profile; the model (gemma3:4b, about 3.3 GB) downloads once on first start:
+      </p>
+      <pre tabindex="0"><code>{`echo "OLLAMA_URL=http://ollama:11434" >> .env
+docker compose --profile ollama up -d`}</code></pre>
+      <p>
+        Already running Ollama on the host? Uncomment the <code>extra_hosts</code> lines under <code>axlebook</code>
+        in <code>docker-compose.yml</code>, set <code>OLLAMA_URL=http://host.docker.internal:11434</code>, and let
+        Ollama accept the connection by adding <code>Environment="OLLAMA_HOST=0.0.0.0"</code> with
+        <code>sudo systemctl edit ollama</code> (then restart it, and keep port 11434 off the internet). An admin
+        picks the model and tests it in Settings. The full guide is in
+        <a href={`${REPO}/blob/main/docs/configuration.md#local-assistant-ollama`}>the configuration reference</a>.
+      </p>
 
       <h2 id="configuration">Configuration</h2>
       <p>
