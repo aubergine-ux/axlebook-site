@@ -1,17 +1,7 @@
 ---
-import Icon from '../components/Icon.astro';
 import Shot from '../components/Shot.astro';
 import Base from '../layouts/Base.astro';
 import { REPO } from '../data/site';
-
-const features = [
-  ['fuel', 'Fuel economy you can trust', 'MPG or L/100 km worked out full tank to full tank, so a partial fill or a forgotten fill-up doesn’t wreck the average.'],
-  ['reminder', 'Reminders that know the odometer', 'Due by date, by distance, or whichever comes first. Log the job and the next one schedules itself.'],
-  ['service', 'Every job, with the receipt', 'Service, repairs, upgrades, fuel and running costs, with tags, notes and the photo or PDF attached.'],
-  ['vehicle', 'Cars, bikes, sleds and semis', 'Each kind of vehicle gets its own garage section and schedule. Engine hours and kWh are handled too.'],
-  ['reports', 'Reports worth printing', 'Spending by month and category, cost per mile, fuel economy over time, as a page or a CSV.'],
-  ['export', 'Bring your spreadsheet', 'Import the .xlsx or .csv you already keep, check a preview, and skip anything that’s already there.'],
-];
 ---
 <Base
   title="Every mile, on the record."
@@ -62,79 +52,115 @@ const features = [
     </div>
   </section>
 
-  <section class="section" aria-labelledby="what">
-    <div class="wrap">
-      <h2 id="what">What it does</h2>
-      <div class="grid grid-3">
-        {
-          features.map(([icon, title, body]) => (
-            <div class="card tile">
-              <Icon name={icon as string} />
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </div>
-          ))
-        }
-      </div>
-      <p class="more"><a href="/features/">All features</a></p>
-    </div>
+  <section class="wrap story" aria-labelledby="why">
+    <h2 id="why">Why I made this</h2>
+    <p>
+      For years my truck’s history lived in three places: a spreadsheet I stopped updating, a shoebox of
+      receipts, and a sticker in the corner of the windshield that was usually wrong. I wanted one place that
+      knew when the oil was actually due, what the truck really gets per gallon, and what it has cost me since
+      I bought it, without handing that to yet another app that wants an account and a subscription.
+    </p>
+    <p>
+      Axlebook is that place. It runs on your own server or a Raspberry Pi in the closet, it doesn’t phone home,
+      and your records never leave your network unless you send them somewhere.
+    </p>
   </section>
 
-  <section class="section" aria-labelledby="look">
-    <div class="wrap">
-      <h2 id="look">A look around</h2>
-      <Shot name="garage" alt="The garage: a card for each vehicle with its odometer or hour meter, what’s due next and what it has cost" eager />
-      <div class="grid grid-2 pair">
-        <figure>
-          <Shot name="vehicle" alt="A vehicle’s overview with average economy, cost per mile, what’s coming up and tips" width={800} />
-          <figcaption>Each vehicle at a glance.</figcaption>
-        </figure>
-        <figure>
-          <Shot name="reports" alt="Reports: spending by month, where the money went and fuel economy over time" width={800} />
-          <figcaption>Where the money went.</figcaption>
-        </figure>
-      </div>
-      <div class="phones">
-        <Shot name="phone-log" alt="Logging a fill-up on a phone" width={260} />
-        <Shot name="phone-fuel" alt="Fuel history with economy for each fill-up" width={260} />
-        <Shot name="phone-reminders" alt="Reminders grouped into overdue and upcoming" width={260} />
-      </div>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="yours">
-    <div class="wrap grid grid-3">
-      <div>
-        <h2 id="yours">Your server, your data</h2>
-        <p class="muted">Nothing to sign up for and nothing to pay.</p>
-      </div>
-      <div class="card">
-        <h3>Self-hosted</h3>
+  <section class="wrap rows" aria-label="A closer look">
+    <div class="row">
+      <div class="row-text">
+        <h2>Log it at the pump</h2>
         <p>
-          It runs on your own machine, from a Raspberry Pi to a home server, with SQLite out of the box or
-          Postgres if you prefer. One button downloads a backup of everything.
+          The fill-up form remembers your vehicle and fills in today’s date. Type any two of gallons, price and
+          total and it works out the third. No signal at the gas station? It keeps the entry on your phone and
+          sends it when you’re back online.
+        </p>
+        <p>
+          Economy is worked out full tank to full tank, so a partial fill carries into the next one and a
+          fill-up you forgot to log only voids that stretch instead of dragging down the average.
         </p>
       </div>
-      <div class="card">
-        <h3>No telemetry, AGPL-3.0</h3>
+      <div class="row-shot phone">
+        <Shot name="phone-log" alt="Logging a fill-up on a phone" width={300} />
+      </div>
+    </div>
+
+    <div class="row flip">
+      <div class="row-text">
+        <h2>The next oil change schedules itself</h2>
         <p>
-          Axlebook doesn’t phone home. It only contacts other servers you set up yourself, like a
-          notification channel or single sign-on. The source is open under the AGPL-3.0.
+          Reminders can be due by date, by miles, or whichever comes first. When you log the job, the next one
+          is set from that record, not from the old due date, so a late oil change doesn’t make the next one
+          early.
         </p>
+        <p>
+          Each vehicle also gets a maintenance schedule for its type, matched against what you’ve already logged,
+          so you can see what’s overdue on a truck you’ve owned for years.
+        </p>
+      </div>
+      <div class="row-shot">
+        <Shot name="vehicle" alt="A vehicle’s overview: average economy, cost per mile, an overdue oil change and tips" width={720} />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-text">
+        <h2>Bring the spreadsheet you already keep</h2>
+        <p>
+          Upload the .xlsx or .csv you’ve been keeping, even if it has a tab per vehicle or every vehicle in one
+          sheet. Axlebook works out which column is which, what units you used and which vehicle each row is for,
+          then shows you a preview before anything is saved. Import it twice and the second time skips what’s
+          already there.
+        </p>
+      </div>
+      <div class="row-shot">
+        <Shot name="import" alt="Importing a workbook with a pickup and a snowmobile, previewed before saving" width={720} />
       </div>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="install">
-    <div class="wrap">
-      <h2 id="install">Install in a minute</h2>
-      <p>You need Docker with Compose.</p>
-      <pre tabindex="0"><code>git clone https://github.com/aubergine-ux/axlebook.git
+  <section class="wrap also" aria-labelledby="also">
+    <h2 id="also">Also in the box</h2>
+    <ul>
+      <li>Service, repair, upgrade and expense records with receipts attached</li>
+      <li>Motorcycles, dirt bikes, ATVs, snowmobiles, semis and trailers</li>
+      <li>Engine-hour meters and electric vehicles</li>
+      <li>Parts on a shelf, used up as you log jobs</li>
+      <li>Reports by month and category, printable or as CSV</li>
+      <li>Notifications by email, ntfy, Gotify, Discord or webhook</li>
+      <li>Household accounts, sharing and single sign-on</li>
+      <li>Inspections and an IFTA worksheet for owner-operators</li>
+      <li>A calendar link for due dates</li>
+      <li>A REST API with docs on your own server</li>
+    </ul>
+    <p><a href="/features/">Everything it does, in more detail</a></p>
+  </section>
+
+  <section class="wrap own" aria-labelledby="yours">
+    <div>
+      <h2 id="yours">Your server, your data</h2>
+      <p>
+        No account to create, nothing to pay, and nothing sent anywhere you didn’t set up yourself. One button in
+        Settings downloads a backup of every record, photo and receipt.
+      </p>
+    </div>
+    <dl class="spec">
+      <div><dt>Runs on</dt><dd>Docker, amd64 or arm64</dd></div>
+      <div><dt>Database</dt><dd>SQLite, or Postgres</dd></div>
+      <div><dt>Telemetry</dt><dd>None</dd></div>
+      <div><dt>License</dt><dd>AGPL-3.0</dd></div>
+    </dl>
+  </section>
+
+  <section class="wrap install" aria-labelledby="install">
+    <h2 id="install">Running it</h2>
+    <pre tabindex="0"><code>git clone https://github.com/aubergine-ux/axlebook.git
 cd axlebook
 docker compose up -d</code></pre>
-      <p>Then open <code>http://localhost:8080</code> and create your account.</p>
-      <p><a href="/docs/">Read the docs</a> for configuration, backups and running it behind a reverse proxy.</p>
-    </div>
+    <p>
+      Then open <code>http://localhost:8080</code> and create your account. The <a href="/docs/">docs</a> cover
+      configuration, backups and reverse proxies. The code is <a href={REPO}>on GitHub</a>.
+    </p>
   </section>
 </Base>
 
@@ -311,25 +337,105 @@ docker compose up -d</code></pre>
       width: 320px;
     }
   }
-  .more {
-    margin-top: 20px;
+  .story p,
+  .install p {
+    max-width: 62ch;
   }
-  .pair {
-    margin-top: 16px;
+  .story {
+    padding-top: 64px;
+    padding-bottom: 24px;
+    font-size: 19px;
   }
-  figure {
-    margin: 0;
+  .rows {
+    padding-top: 24px;
   }
-  figcaption {
-    margin-top: 8px;
-    color: var(--ink-muted);
-    font-size: 15px;
-  }
-  .phones {
+  .row {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 16px;
-    max-width: 820px;
+    gap: 28px;
+    align-items: center;
+    padding: 48px 0;
+    border-top: 1px solid var(--line);
+  }
+  .row-text {
+    max-width: 52ch;
+  }
+  .row-text p {
+    color: var(--ink-muted);
+  }
+  .phone {
+    max-width: 300px;
+  }
+  @media (min-width: 900px) {
+    .row {
+      grid-template-columns: 1fr 1.35fr;
+      gap: 56px;
+    }
+    .row.flip {
+      grid-template-columns: 1.35fr 1fr;
+    }
+    .row.flip .row-text {
+      order: 2;
+    }
+    .row:first-child {
+      grid-template-columns: 1.4fr 1fr;
+    }
+    .phone {
+      justify-self: center;
+    }
+  }
+  .also {
+    padding-top: 48px;
+    padding-bottom: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .also ul {
+    columns: 2 300px;
+    column-gap: 48px;
+    padding-left: 1.1em;
+    margin: 0 0 20px;
+  }
+  .also li {
+    margin: 0 0 8px;
+    break-inside: avoid;
+  }
+  .own {
+    display: grid;
+    gap: 24px;
+    padding-top: 48px;
+    padding-bottom: 24px;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 900px) {
+    .own {
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+    }
+  }
+  .spec {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 15px;
+    border-top: 1px solid var(--line-strong);
+  }
+  .spec div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .spec dt {
+    color: var(--ink-muted);
+  }
+  .spec dd {
+    margin: 0;
+    text-align: right;
+  }
+  .install {
+    padding-top: 48px;
+    border-top: 1px solid var(--line);
+  }
+  .install pre {
+    max-width: 640px;
   }
 </style>

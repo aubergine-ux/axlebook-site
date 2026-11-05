@@ -1,5 +1,4 @@
 ---
-import Icon from '../../components/Icon.astro';
 import Shot from '../../components/Shot.astro';
 import Base from '../../layouts/Base.astro';
 
@@ -66,12 +65,11 @@ const groups: { title: string; items: [string, string, string][] }[] = [
 
     {
       groups.map((g) => (
-        <section class="section" aria-label={g.title}>
+        <section class="group" aria-label={g.title}>
           <h2>{g.title}</h2>
-          <div class="grid grid-2">
-            {g.items.map(([icon, title, body]) => (
-              <div class="card tile">
-                <Icon name={icon} />
+          <div class="items">
+            {g.items.map(([, title, body]) => (
+              <div class="item">
                 <h3>{title}</h3>
                 <p>{body}</p>
               </div>
@@ -81,7 +79,7 @@ const groups: { title: string; items: [string, string, string][] }[] = [
       ))
     }
 
-    <section class="section" aria-labelledby="local-model">
+    <section class="group" aria-labelledby="local-model">
       <h2 id="local-model">Optional local AI</h2>
       <div class="grid grid-2">
         <div class="prose">
@@ -104,6 +102,31 @@ const groups: { title: string; items: [string, string, string][] }[] = [
 <style>
   .page-head {
     padding: 48px 0 8px;
+  }
+  .group {
+    display: grid;
+    gap: 8px 56px;
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+  }
+  .items {
+    display: grid;
+    gap: 28px 48px;
+  }
+  .item h3 {
+    margin-bottom: 6px;
+  }
+  .item p {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+  @media (min-width: 900px) {
+    .group {
+      grid-template-columns: 220px minmax(0, 1fr);
+    }
+    .items {
+      grid-template-columns: 1fr 1fr;
+    }
   }
   .page-head h1 {
     font-size: 40px;
