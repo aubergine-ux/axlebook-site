@@ -130,8 +130,10 @@ const og = new URL('/og-image.png', SITE).href;
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--surface-raised);
-    border-bottom: 1px solid var(--line);
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    border-bottom: 1px solid var(--glass-line);
   }
   .bar {
     display: flex;
@@ -182,7 +184,7 @@ const og = new URL('/og-image.png', SITE).href;
     padding: 0 14px;
     border: 1px solid var(--line-strong);
     border-radius: var(--radius-md);
-    background: var(--surface-raised);
+    background: var(--glass);
     color: var(--ink);
     font: 600 14px var(--sans);
     cursor: pointer;
@@ -203,8 +205,8 @@ const og = new URL('/og-image.png', SITE).href;
   }
   .site-footer {
     margin-top: 64px;
-    border-top: 1px solid var(--line);
-    background: var(--surface-raised);
+    border-top: 1px solid var(--glass-line);
+    background: var(--glass);
     padding: 32px 0;
     font-size: 15px;
   }

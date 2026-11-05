@@ -18,17 +18,46 @@ const features = [
   description="Axlebook is a free, self-hosted logbook for your vehicles: fuel economy, maintenance reminders, service records and costs, on your own server."
 >
   <section class="hero">
-    <div class="wrap">
-      <img class="lockup on-light" src="/brand/axlebook-lockup-horizontal-on-light.svg" alt="Axlebook" width="440" height="96" />
-      <img class="lockup on-dark" src="/brand/axlebook-lockup-horizontal-on-dark.svg" alt="Axlebook" width="440" height="96" />
-      <h1 class="ax-display">Every mile, on the record.</h1>
-      <p class="lede">
-        A free, self-hosted logbook for your cars, bikes, sleds and semis: fuel, maintenance, reminders
-        and costs, kept on your own server.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="/docs/#install">Get started</a>
-        <a class="btn" href={REPO}>View on GitHub</a>
+    <svg class="gauge" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="currentColor">
+        <circle cx="300" cy="300" r="120" />
+        <circle cx="300" cy="300" r="180" />
+        <circle cx="300" cy="300" r="240" />
+        <circle cx="300" cy="300" r="296" />
+      </g>
+      <path class="arc" d="M 130 470 A 240 240 0 1 1 470 470" fill="none" stroke-width="6" stroke-linecap="round" />
+      <line class="needle" x1="300" y1="300" x2="420" y2="180" stroke-width="8" stroke-linecap="round" />
+      <circle class="hub" cx="300" cy="300" r="12" />
+    </svg>
+    <div class="wrap hero-grid">
+      <div>
+        <img class="lockup" src="/brand/axlebook-lockup-horizontal-on-dark.svg" alt="Axlebook" width="440" height="96" />
+        <h1 class="ax-display">Every mile, on the record.</h1>
+        <p class="lede">
+          A free, self-hosted logbook for your cars, bikes, sleds and semis: fuel, maintenance, reminders
+          and costs, kept on your own server.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="/docs/#install">Get started</a>
+          <a class="btn btn-ghost" href={REPO}>View on GitHub</a>
+        </div>
+      </div>
+      <div class="panel" aria-hidden="true">
+        <div class="panel-head">
+          <img src="/brand/axlebook-icon-default.svg" alt="" width="72" height="72" />
+          <div>
+            <p class="panel-title">2015 Toyota Tacoma</p>
+            <p class="panel-sub mono">Demo data</p>
+          </div>
+        </div>
+        <p class="panel-label">Odometer</p>
+        <p class="readout mono">
+          {['0', '8', '5', '9', '4'].map((d) => <span>{d}</span>)}<span class="last">2</span><small>mi</small>
+        </p>
+        <dl class="panel-stats">
+          <div><dt>Average</dt><dd class="mono">19.7 mpg</dd></div>
+          <div><dt>Oil change</dt><dd class="status"><span class="dot"></span>Overdue</dd></div>
+        </dl>
       </div>
     </div>
   </section>
@@ -111,10 +140,57 @@ docker compose up -d</code></pre>
 
 <style>
   .hero {
-    padding: 56px 0 40px;
+    /* Graphite in both themes, like the brand guide cover. */
+    --focus: #ffab4a;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(40rem 28rem at 85% 20%, rgba(255, 138, 0, 0.12), transparent 70%),
+      linear-gradient(180deg, #1c1f22, #121416);
+    color: #f2f4f5;
+    padding: 48px 0 56px;
+    border-bottom: 1px solid #2a2e33;
+  }
+  .gauge {
+    position: absolute;
+    width: 760px;
+    max-width: none;
+    right: -260px;
+    top: -120px;
+    color: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+  /* On narrow screens the gauge sits behind the text: keep the faint arcs, drop the needle. */
+  @media (max-width: 899px) {
+    .gauge {
+      right: -380px;
+      top: -200px;
+    }
+    .gauge .needle,
+    .gauge .hub {
+      display: none;
+    }
+    .gauge .arc {
+      opacity: 0.4;
+    }
+  }
+  .gauge .arc {
+    stroke: rgba(255, 154, 31, 0.35);
+  }
+  .gauge .needle {
+    stroke: #ff9a1f;
+  }
+  .gauge .hub {
+    fill: #ff9a1f;
+  }
+  .hero-grid {
+    position: relative;
+    display: grid;
+    gap: 40px;
+    align-items: center;
   }
   .lockup {
-    width: 260px;
+    width: 240px;
     height: auto;
     margin-bottom: 28px;
   }
@@ -124,19 +200,116 @@ docker compose up -d</code></pre>
     margin-bottom: 16px;
     max-width: 16ch;
   }
-  @media (min-width: 768px) {
+  .hero .lede {
+    color: #c4cad0;
+    margin-bottom: 28px;
+  }
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #f2f4f5;
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .panel {
+    justify-self: start;
+    width: min(100%, 380px);
+    padding: 22px;
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 24px 48px rgba(0, 0, 0, 0.35);
+  }
+  .panel p {
+    margin: 0;
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    font-weight: 700;
+  }
+  .panel-sub,
+  .panel-label,
+  dt {
+    color: #a3aab1;
+    font-size: 14px;
+  }
+  .readout {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    margin: 6px 0 20px !important;
+  }
+  .readout span {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 52px;
+    border-radius: var(--radius-sm);
+    background: #2c3136;
+    color: #f2f4f5;
+    font-size: 30px;
+    font-weight: 600;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .readout .last {
+    background: #ff9a1f;
+    color: #1a1206;
+  }
+  .readout small {
+    margin-left: 4px;
+    color: #a3aab1;
+    font-size: 16px;
+  }
+  .panel-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  dd {
+    margin: 2px 0 0;
+    font-weight: 600;
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ff857a;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff857a;
+  }
+  @media (min-width: 900px) {
     .hero {
-      padding: 88px 0 64px;
+      padding: 88px 0 96px;
+    }
+    .hero-grid {
+      grid-template-columns: 1.3fr 1fr;
+    }
+    .panel {
+      justify-self: end;
     }
     h1 {
       font-size: 64px;
     }
     .lockup {
-      width: 340px;
+      width: 320px;
     }
-  }
-  .lede {
-    margin-bottom: 28px;
   }
   .more {
     margin-top: 20px;
