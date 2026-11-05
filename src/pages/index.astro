@@ -1,0 +1,162 @@
+---
+import Icon from '../components/Icon.astro';
+import Shot from '../components/Shot.astro';
+import Base from '../layouts/Base.astro';
+import { REPO } from '../data/site';
+
+const features = [
+  ['fuel', 'Fuel economy you can trust', 'MPG or L/100 km worked out full tank to full tank, so a partial fill or a forgotten fill-up doesn’t wreck the average.'],
+  ['reminder', 'Reminders that know the odometer', 'Due by date, by distance, or whichever comes first. Log the job and the next one schedules itself.'],
+  ['service', 'Every job, with the receipt', 'Service, repairs, upgrades, fuel and running costs, with tags, notes and the photo or PDF attached.'],
+  ['vehicle', 'Cars, bikes, sleds and semis', 'Each kind of vehicle gets its own garage section and schedule. Engine hours and kWh are handled too.'],
+  ['reports', 'Reports worth printing', 'Spending by month and category, cost per mile, fuel economy over time, as a page or a CSV.'],
+  ['export', 'Bring your spreadsheet', 'Import the .xlsx or .csv you already keep, check a preview, and skip anything that’s already there.'],
+];
+---
+<Base
+  title="Every mile, on the record."
+  description="Axlebook is a free, self-hosted logbook for your vehicles: fuel economy, maintenance reminders, service records and costs, on your own server."
+>
+  <section class="hero">
+    <div class="wrap">
+      <img class="lockup on-light" src="/brand/axlebook-lockup-horizontal-on-light.svg" alt="Axlebook" width="440" height="96" />
+      <img class="lockup on-dark" src="/brand/axlebook-lockup-horizontal-on-dark.svg" alt="Axlebook" width="440" height="96" />
+      <h1 class="ax-display">Every mile, on the record.</h1>
+      <p class="lede">
+        A free, self-hosted logbook for your cars, bikes, sleds and semis: fuel, maintenance, reminders
+        and costs, kept on your own server.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/docs/#install">Get started</a>
+        <a class="btn" href={REPO}>View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="what">
+    <div class="wrap">
+      <h2 id="what">What it does</h2>
+      <div class="grid grid-3">
+        {
+          features.map(([icon, title, body]) => (
+            <div class="card tile">
+              <Icon name={icon as string} />
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="more"><a href="/features/">All features</a></p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="look">
+    <div class="wrap">
+      <h2 id="look">A look around</h2>
+      <Shot name="garage" alt="The garage: a card for each vehicle with its odometer or hour meter, what’s due next and what it has cost" eager />
+      <div class="grid grid-2 pair">
+        <figure>
+          <Shot name="vehicle" alt="A vehicle’s overview with average economy, cost per mile, what’s coming up and tips" width={800} />
+          <figcaption>Each vehicle at a glance.</figcaption>
+        </figure>
+        <figure>
+          <Shot name="reports" alt="Reports: spending by month, where the money went and fuel economy over time" width={800} />
+          <figcaption>Where the money went.</figcaption>
+        </figure>
+      </div>
+      <div class="phones">
+        <Shot name="phone-log" alt="Logging a fill-up on a phone" width={260} />
+        <Shot name="phone-fuel" alt="Fuel history with economy for each fill-up" width={260} />
+        <Shot name="phone-reminders" alt="Reminders grouped into overdue and upcoming" width={260} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="yours">
+    <div class="wrap grid grid-3">
+      <div>
+        <h2 id="yours">Your server, your data</h2>
+        <p class="muted">Nothing to sign up for and nothing to pay.</p>
+      </div>
+      <div class="card">
+        <h3>Self-hosted</h3>
+        <p>
+          It runs on your own machine, from a Raspberry Pi to a home server, with SQLite out of the box or
+          Postgres if you prefer. One button downloads a backup of everything.
+        </p>
+      </div>
+      <div class="card">
+        <h3>No telemetry, AGPL-3.0</h3>
+        <p>
+          Axlebook doesn’t phone home. It only contacts other servers you set up yourself, like a
+          notification channel or single sign-on. The source is open under the AGPL-3.0.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="install">
+    <div class="wrap">
+      <h2 id="install">Install in a minute</h2>
+      <p>You need Docker with Compose.</p>
+      <pre tabindex="0"><code>git clone https://github.com/aubergine-ux/axlebook.git
+cd axlebook
+docker compose up -d</code></pre>
+      <p>Then open <code>http://localhost:8080</code> and create your account.</p>
+      <p><a href="/docs/">Read the docs</a> for configuration, backups and running it behind a reverse proxy.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding: 56px 0 40px;
+  }
+  .lockup {
+    width: 260px;
+    height: auto;
+    margin-bottom: 28px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.05;
+    margin-bottom: 16px;
+    max-width: 16ch;
+  }
+  @media (min-width: 768px) {
+    .hero {
+      padding: 88px 0 64px;
+    }
+    h1 {
+      font-size: 64px;
+    }
+    .lockup {
+      width: 340px;
+    }
+  }
+  .lede {
+    margin-bottom: 28px;
+  }
+  .more {
+    margin-top: 20px;
+  }
+  .pair {
+    margin-top: 16px;
+  }
+  figure {
+    margin: 0;
+  }
+  figcaption {
+    margin-top: 8px;
+    color: var(--ink-muted);
+    font-size: 15px;
+  }
+  .phones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+    max-width: 820px;
+  }
+</style>

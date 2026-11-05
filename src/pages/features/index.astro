@@ -1,0 +1,112 @@
+---
+import Icon from '../../components/Icon.astro';
+import Shot from '../../components/Shot.astro';
+import Base from '../../layouts/Base.astro';
+
+const groups: { title: string; items: [string, string, string][] }[] = [
+  {
+    title: 'The logbook',
+    items: [
+      ['garage', 'Vehicles', 'A garage of vehicles with photos, nicknames, VINs, plates and unit numbers. Each card shows the current odometer, what’s due next and what it has cost. Archive the ones you’ve sold.'],
+      ['service', 'Records', 'Service, repair, upgrade, fuel and expense records (registration, insurance, tax, parking, tolls, loan payments). Each one can carry tags, notes and receipts as photos or PDFs.'],
+      ['odometer', 'Odometer log', 'Every record with a reading adds to the log automatically. A reading lower than an earlier one still saves, with a warning that it might be a typo.'],
+      ['fuel', 'Fuel economy', 'MPG, L/100 km or km/L, worked out full tank to full tank. Partial fills carry into the next full one, and a fill-up you forgot to log voids only that stretch instead of skewing the average. Imperial, metric, US and UK gallons all convert.'],
+      ['reminder', 'Reminders', 'Due by date, by distance, or whichever comes first. A recurring reminder schedules its next due point from the record that completes it. A calendar link puts due dates in your phone’s calendar.'],
+      ['planner', 'Maintenance schedule', 'A built-in schedule for each kind of vehicle, checked against your own records to show when each job was last done and when it’s next due. Tick the ones you want as reminders.'],
+    ],
+  },
+  {
+    title: 'Every kind of vehicle',
+    items: [
+      ['vehicle', 'Cars, bikes, sleds and semis', 'Cars and pickups, motorcycles, dirt bikes, ATVs and side-by-sides, snowmobiles, semi trucks and trailers, each in its own section of the garage.'],
+      ['odometer', 'Hours and kWh', 'Engine-hour meters for machines that don’t count miles (fuel per hour), and kWh for electric vehicles (miles per kWh).'],
+      ['repair', 'For owner-operators', 'Pre-trip and post-trip inspections (DVIR) with defects tracked until they’re corrected, and an IFTA worksheet that splits each quarter’s distance and fuel by state or province. It’s a worksheet to fill in your return from, not a filing service.'],
+      ['upgrade', 'Tips for each vehicle', 'Suggestions worked out from the vehicle’s own numbers: economy slipping, too many partial fills, an overdue job that costs fuel, seasonal care.'],
+    ],
+  },
+  {
+    title: 'Parts, plans and reports',
+    items: [
+      ['parts', 'Parts inventory', 'Oil, filters and spares on a shelf. Using a part in a record takes it off the shelf in the same step; editing the record adjusts the difference and deleting it puts the part back. Stock can go below zero, shown in red, for when you log after the fact.'],
+      ['planner', 'Planner', 'A list of jobs you mean to get to, with priority, status and an estimated cost. When one is done, turn it into a record.'],
+      ['reports', 'Reports', 'Spending by month and category, cost per distance, fuel economy over time and lifetime totals, for one vehicle or the whole garage. Print them, or download a CSV.'],
+      ['search', 'Search', 'Find any record across the garage by text, tag or type.'],
+    ],
+  },
+  {
+    title: 'Getting data in and out',
+    items: [
+      ['export', 'Spreadsheet import', 'Bring an .xlsx or .csv, with one sheet per vehicle or several vehicles in one sheet. Axlebook works out the columns, units and vehicles, shows a preview, and skips anything already imported.'],
+      ['export', 'CSV import and export', 'Export any vehicle’s records as CSV and import them back, with a dry-run preview first. CSV exports from LubeLogger can be imported too; that importer is experimental.'],
+      ['attachment', 'Backup and restore', 'One download holds every record, reminder, part, photo and receipt. Restore it into a fresh install, on SQLite or Postgres.'],
+    ],
+  },
+  {
+    title: 'Living with it',
+    items: [
+      ['settings', 'Accounts and roles', 'Accounts for the household with admin, editor and viewer roles, and per-vehicle sharing with view or edit access.'],
+      ['settings', 'Single sign-on', 'Optional sign-in through any OpenID Connect provider, such as Authentik, Authelia or Keycloak. Password sign-in can be turned off.'],
+      ['reminder', 'Notifications', 'A nudge by email, webhook, ntfy, Gotify or Discord when a reminder becomes due soon or overdue, sent once per change rather than every day. Each channel has a test button.'],
+      ['fuel', 'Installable, works offline', 'Add it to your phone’s home screen. A fill-up logged with no signal is kept on the phone and sent when you’re back online.'],
+      ['tag', 'REST API', 'Everything the app does goes through a documented REST API, with interactive docs on your own server at /api/docs and personal API tokens for scripts.'],
+      ['tag', 'Your units, your language', 'Imperial or metric, any currency, light and dark themes, keyboard-accessible, with every word of the interface in a translation file.'],
+    ],
+  },
+];
+---
+<Base
+  title="Features"
+  description="Everything Axlebook does: fuel economy, reminders, service records, parts, reports, imports, backups, roles, single sign-on, notifications and an API."
+>
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="ax-display">Features</h1>
+      <p class="lede">What Axlebook does today. Nothing on this page is a plan or a promise.</p>
+    </header>
+
+    {
+      groups.map((g) => (
+        <section class="section" aria-label={g.title}>
+          <h2>{g.title}</h2>
+          <div class="grid grid-2">
+            {g.items.map(([icon, title, body]) => (
+              <div class="card tile">
+                <Icon name={icon} />
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="section" aria-labelledby="local-model">
+      <h2 id="local-model">Optional local AI</h2>
+      <div class="grid grid-2">
+        <div class="prose">
+          <p>
+            If you run <a href="https://ollama.com">Ollama</a> next to Axlebook, it can help in a few places:
+            reading a messy spreadsheet, tailoring the maintenance schedule to your exact make and model,
+            estimating what economy your vehicle should get, and giving tips specific to it.
+          </p>
+          <p>
+            The model runs on your own server and nothing about your vehicles is sent anywhere. It’s off unless
+            you set it up, and everything else works the same without it.
+          </p>
+        </div>
+        <Shot name="schedule" alt="A semi truck’s maintenance schedule showing when each job was last done and when it’s next due" width={700} />
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page-head {
+    padding: 48px 0 8px;
+  }
+  .page-head h1 {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+</style>
